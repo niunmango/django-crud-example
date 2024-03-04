@@ -6,6 +6,8 @@ services:
       POSTGRES_DB: crud
       POSTGRES_USER: crud
       POSTGRES_PASSWORD: mysecretpassword
+    volumes:
+      - dbdata:/var/lib/postgresql/data
     ports:
       - "5432:5432"
   web:
@@ -14,3 +16,5 @@ services:
       - "8000:8000"
     depends_on:
       - db
+volumes:
+  dbdata:
