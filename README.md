@@ -330,6 +330,6 @@ Every time you commit new changes, the image will be recreated. To access it you
 docker pull ghcr.io/{your-github-user}/django-crud-example:latest
 ```
 
-
+Replace "your-github-user" with your GitHub user
 
 
