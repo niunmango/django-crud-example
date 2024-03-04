@@ -1,4 +1,4 @@
-# A Simple Example of Django CRUD (Create, Retrieve, Update and Delete) Application Using Functional Based Views
+# A Simple Example of Django CRUD (Create, Retrieve, Update and Delete) Application Using Functional Based Views. Dockerization added
 
 We will use Django and functional based views to develop a simple application to allow one to create a new task, retrieve task list or a single task, update a task and delete a task. 
 
@@ -231,6 +231,77 @@ We only need to create 3 templates: `task_list.html`, `task_detail.html` and `ta
 python manage.py makemigrations
 python manage.py migrate
 python manage.py runserver
+```
+
+### Step 6: Build your requirements.txt file
+
+```
+pip freeze > requirements.txt
+```
+
+Check the generated requirements.txt for unnecesary packages. Required packages are usually:
+
+```
+asgiref==3.7.2
+Django==5.0.2
+django-redis==5.4.0
+Pillow==9.0.1
+PyJWT==2.3.0
+redis==5.0.2
+sqlparse==0.4.4
+```
+
+### Step 7: Create your Dockerfile for container build up
+
+```
+# Use an official Python runtime
+FROM python:3.12-bookworm
+
+# Allows docker to cache installed dependencies between builds
+COPY requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code to image
+COPY . code
+WORKDIR /code
+
+EXPOSE 8000
+
+
+# runs the production server
+ENTRYPOINT ["python", "manage.py"]
+CMD ["runserver", "0.0.0.0:8000"]
+```
+
+Build your local image:
+
+``` 
+docker build -t django-crud-example .
+```
+
+Run it for testing:
+
+```
+docker run -it -p 8000:8000 django-crud-example
+```
+
+### Step 8: Create a simple CI file for Github Actions in .github/workflows
+
+```
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag django-crud-example:$(date +%s)
+```
+
+Every time you commit new changes, the image will be recreated. To access it you will need to run:
+
 ```
 
 
