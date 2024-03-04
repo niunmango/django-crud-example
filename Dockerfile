@@ -11,7 +11,8 @@ WORKDIR /code
 
 EXPOSE 8000
 
-
 # runs the production server
-ENTRYPOINT ["python", "manage.py"]
-CMD ["runserver", "0.0.0.0:8000"]
+COPY ./entrypoint.sh /code/entrypoint.sh
+RUN chmod +x /code/entrypoint.sh
+
+ENTRYPOINT ["/code/entrypoint.sh", "db", "python", "manage.py", "runserver", "0.0.0.0:8000"]

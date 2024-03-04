@@ -1,0 +1,16 @@
+version: '3'
+services:
+  db:
+    image: postgres:16.2
+    environment:
+      POSTGRES_DB: crud
+      POSTGRES_USER: crud
+      POSTGRES_PASSWORD: mysecretpassword
+    ports:
+      - "5432:5432"
+  web:
+    image: ghcr.io/niunmango/django-crud-example:latest
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db

@@ -1,7 +1,5 @@
-# Common exclusions
 *.pyc 
 __pycache__  
 .env  
-# Project-specific exclusions
 venv/  
 crud/
