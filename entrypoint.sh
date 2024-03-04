@@ -11,5 +11,8 @@ until PGPASSWORD=mysecretpassword psql -h "db" -U "crud" -c '\q'; do
   sleep 1
 done
 
+python manage.py migrate
+
 >&2 echo "Postgres is up - executing command"
+
 exec $cmd
