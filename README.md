@@ -322,23 +322,14 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/django-crud-example:latest
-
-      - name: Set image to public
-        run: |
-          PACKAGE_VERSION=$(echo $GITHUB_SHA | cut -c1-7)
-          PACKAGE_NAME="django-crud-example"
-          echo PACKAGE_VERSION=$PACKAGE_VERSION
-          echo PACKAGE_NAME=$PACKAGE_NAME
-          curl -X PATCH \
-            -H "Accept: application/vnd.github.v3+json" \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/user/packages/container/$PACKAGE_NAME/versions/$PACKAGE_VERSION \
-            -d '{"visibility":"public"}'
 ```
 
 Every time you commit new changes, the image will be recreated. To access it you will need to run:
 
 ```
+docker pull ghcr.io/{your-github-user}/django-crud-example:latest
+```
+
 
 
 
