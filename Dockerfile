@@ -1,6 +1,9 @@
 # Use an official Python runtime
 FROM python:3.12-bookworm
 
+# Install psql
+RUN apt-get update && apt-get install -y postgresql-client
+
 # Allows docker to cache installed dependencies between builds
 COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
