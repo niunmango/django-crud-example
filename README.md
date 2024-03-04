@@ -288,6 +288,14 @@ docker run -it -p 8000:8000 django-crud-example
 ### Step 8: Create a simple CI file for Github Actions in .github/workflows
 
 ```
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
 jobs:
 
   build:
@@ -295,9 +303,37 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag django-crud-example:$(date +%s)
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1 
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/django-crud-example:latest
+
+      - name: Set image to public
+        run: |
+          PACKAGE_VERSION=$(echo $GITHUB_SHA | cut -c1-7)
+          PACKAGE_NAME="django-crud-example"
+          echo PACKAGE_VERSION=$PACKAGE_VERSION
+          echo PACKAGE_NAME=$PACKAGE_NAME
+          curl -X PATCH \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/user/packages/container/$PACKAGE_NAME/versions/$PACKAGE_VERSION \
+            -d '{"visibility":"public"}'
 ```
 
 Every time you commit new changes, the image will be recreated. To access it you will need to run:
