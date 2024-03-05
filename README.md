@@ -166,7 +166,7 @@ def task_delete(request, pk):
 
 We only need to create 3 templates: `task_list.html`, `task_detail.html` and `task_form.html`. The last template will be shared by `task_create` and `task_update` views. 
 
-```
+```html
 # tasks/templates/tasks/task_list.html
 <!DOCTYPE html>
 <html lang="en">
@@ -239,9 +239,10 @@ python manage.py runserver
 pip freeze > requirements.txt
 ```
 
-Check the generated requirements.txt for unnecesary packages. Required packages are usually:
+Check the generated `requirements.txt` for unnecesary packages. Required packages are usually:
 
-```
+```python
+#requirements.txt content
 asgiref==3.7.2
 Django==5.0.2
 django-redis==5.4.0
@@ -253,7 +254,7 @@ sqlparse==0.4.4
 
 ### Step 7: Create your Dockerfile for container build up
 
-```
+```Dockerfile
 # Use an official Python runtime
 FROM python:3.12-bookworm
 
@@ -287,7 +288,7 @@ docker run -it -p 8000:8000 django-crud-example
 
 ### Step 8: Create a simple CI file for Github Actions in .github/workflows
 
-```
+```yaml
 name: Docker Image CI
 
 on:
@@ -338,7 +339,7 @@ To deploy the app to Kubernetes, you will need to create two deployments, one fo
 
 App deployment (save, for example, as `web.yaml`):
 
-```
+```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -364,7 +365,7 @@ You can scale the replicas as needed.
 
 DB deployment (saver, for example, as `db.yaml`):
 
-```
+```yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -417,7 +418,7 @@ Adding replicas to a postgres DB is not so straightforward
 
 You will also need services to access the db and to expose the app (save as `services.yaml`):
 
-```
+```yaml
 apiVersion: v1
 kind: Service
 metadata:
