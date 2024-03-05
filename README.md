@@ -332,4 +332,126 @@ docker pull ghcr.io/{your-github-user}/django-crud-example:latest
 
 Replace "your-github-user" with your GitHub user
 
+### Step 9: Deploy to k8s
+
+To deploy the app to Kubernetes, you will need to create two deployments, one for the app itself and a second one for the DB.
+
+App deployment (save, for example, as `web.yaml`):
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: django
+  template:
+    metadata:
+      labels:
+        app: django
+    spec:
+      containers:
+      - name: django
+        image: ghcr.io/{your.github-user}/django-crud-example:latest
+        ports:
+        - containerPort: 8000
+```
+
+You can scale the replicas as needed.
+
+DB deployment (saver, for example, as `db.yaml`):
+
+```
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:16.2
+        env:
+        - name: POSTGRES_DB
+          value: crud
+        - name: POSTGRES_USER
+          value: crud
+        - name: POSTGRES_PASSWORD
+          value: mysecretpassword
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        ports:
+        - containerPort: 5432
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data
+          name: dbdata
+      volumes:
+      - name: dbdata
+        persistentVolumeClaim:
+          claimName: dbdata-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dbdata-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+```
+Adding replicas to a postgres DB is not so straightforward
+
+
+You will also need services to access the db and to expose the app (save as `services.yaml`):
+
+```
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+spec:
+  selector:
+    app: postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+spec:
+  selector:
+    app: django
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+```
+
+And now you should apply all these YAML files.
+
+```
+kubectl apply -f web.yaml
+kubectl apply -f db.yaml
+kubectl apply -f services.yaml
+```
+
+If you use a service like openshift, you will need to expose the `web` service to Internet using a route, and add the hostname to `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS` in your `settings.py` file
+
+
 
