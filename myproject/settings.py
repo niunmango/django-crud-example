@@ -27,6 +27,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['web-ramiro-gp-dev.apps.sandbox-m3.1530.p1.openshiftapps.com', 'localhost', '127.0.0.1']
 
+CSRF_TRUSTED_ORIGINS = ['web-ramiro-gp-dev.apps.sandbox-m3.1530.p1.openshiftapps.com']
+
+
 
 # Application definition
 
